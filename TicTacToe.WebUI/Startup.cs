@@ -62,6 +62,7 @@ namespace TicTacToe.WebUI
                 );
             app.UseRewriter(rewrite);
             app.UseHttpsRedirection();
+            app.UseWebSockets();
             app.UseStaticFiles();
 
             app.UseRouting();
