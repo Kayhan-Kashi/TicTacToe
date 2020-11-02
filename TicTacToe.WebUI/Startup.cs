@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using TicTacToe.Services.Concretes;
 using TicTacToe.Services.Interfaces;
 using TicTacToe.WebUI.Extensions;
+using TicTacToe.WebUI.Services;
 
 namespace TicTacToe.WebUI
 {
@@ -27,8 +31,15 @@ namespace TicTacToe.WebUI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRazorPages();
+            services.AddRouting();
+            services.AddControllersWithViews();
+            //services.AddDirectoryBrowser();
             services.AddSingleton<IUserService, UserService>();
+            services.AddSession(o => o.IdleTimeout = TimeSpan.FromMinutes(30));
+            services.AddLocalization();
+            services.AddMvc()
+                .AddViewLocalization()
+                .AddDataAnnotationsLocalization();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,36 +56,33 @@ namespace TicTacToe.WebUI
                 app.UseHsts();
             }
 
-
-            //app.Use(async (context, next) =>
-            //{
-            //    var url = context.Request.Path.Value;
-            //    //context.Request.Path = "/Registration/UserRegistration/NewUser";
-            //    //context.Response.Redirect("/Registration/UserRegistration/Index");
-            //    if (url.Contains("/Registration/UserRegistration"))
-            //    {
-            //        context.Request.Path = "/Registration/UserRegistration/NewUser";
-            //    }
-            //    await next();
-            //});
             var rewrite = new RewriteOptions().AddRewrite(
                  "Registration/UserRegistration/NewUser", "Registration/UserRegistration/index", true
                 );
             app.UseRewriter(rewrite);
-            app.UseHttpsRedirection();
-            app.UseWebSockets();
+
             app.UseStaticFiles();
-
+            app.UseSession();
+            app.UseCookiePolicy();
             app.UseRouting();
-
             app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapRazorPages();
-            });         
+            app.UseWebSockets();
 
             app.UseCommunicationMiddleware();
+
+            var supportedCultures = CultureInfo.GetCultures(CultureTypes.AllCultures);
+
+            var localizationOptions = new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("en-US"),
+                SupportedCultures = supportedCultures,
+                SupportedUICultures = supportedCultures
+            };
+
+            localizationOptions.RequestCultureProviders.Clear();
+            localizationOptions.RequestCultureProviders.Add(new CultureProviderResolverService());
+
+            app.UseRequestLocalization(localizationOptions);
 
             app.UseEndpoints(endpoints =>
             {
@@ -92,8 +100,8 @@ namespace TicTacToe.WebUI
             });
 
 
+            app.UseStatusCodePages("text/plain", "HTTP Error - Status Code: {0}");
 
-  
 
         }
     }

@@ -8,13 +8,17 @@ namespace TicTacToe.Dal.DataModel
     public class User
     {
         public Guid Id { get; set; }
-        [Required()]
+        [Display(Name = "FirstName")]
+        [Required(ErrorMessage = "FirstNameRequired")]
         public string FirstName { get; set; }
-        [Required()]
+        [Display(Name = "LastName")]
+        [Required(ErrorMessage = "LastNameRequired")]
         public string LastName { get; set; }
-        [Required(), DataType(DataType.EmailAddress)]
+        [Display(Name = "Email")]
+        [Required(ErrorMessage = "EmailRequired"), DataType(DataType.EmailAddress)]
         public string Email { get; set; }
-        [Required(), DataType(DataType.Password)]
+        [Display(Name = "Password")]
+        [Required(ErrorMessage = "PasswordRequired"), DataType(DataType.Password)]
         public string Password { get; set; }
         public bool IsEmailConfirmed { get; set; }
         public System.DateTime? EmailConfirmationDate { get; set; }

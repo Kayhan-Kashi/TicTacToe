@@ -5,12 +5,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Remove="Localization\Registration\Views\Home.Index.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Localization\Registration\Views\Home.Index.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Localization" Version="2.2.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TicTacToe.Dal\TicTacToe.Dal.csproj" />
     <ProjectReference Include="..\TicTacToe.Services\TicTacToe.Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Registration\Localization\Controllers\" />
+    <Folder Include="Localization\Registration\Controllers\" />
   </ItemGroup>
 
 </Project>
